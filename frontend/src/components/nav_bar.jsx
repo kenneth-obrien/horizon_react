@@ -6,11 +6,9 @@ class NavBar extends React.Component{
   return (
       <React.Fragment>
       <Navbar bg="dark" variant="dark" sticky="top">
-      <Navbar.Brand>Horizon</Navbar.Brand>
+      <Navbar.Brand>Horizon API </Navbar.Brand>
       <Navbar.Toggle />
-      <Navbar.Collapse className="justify-content-end">
-      {this.props.label}
-      </Navbar.Collapse>
+      <Navbar.Collapse className="justify-content-end"> {this.props.label} </Navbar.Collapse>
       </Navbar>
       </React.Fragment>
     );

@@ -11,6 +11,8 @@ import CardDeck from 'react-bootstrap/CardDeck';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import CachedIcon from '@material-ui/icons/Cached';
 
 class NewsFeed extends React.Component{
   constructor(props) {
@@ -36,6 +38,23 @@ class NewsFeed extends React.Component{
     });
    }
 
+   handleUpdate = async() => {
+     this.setState({ news: [] });
+     const config = {
+       headers: {'Authorization': `Token ${this.props.token}`},
+     }
+     await axios.get('http://localhost:8000/api/news/', config).then(res => {
+       let news = this.state.news;
+       res.data.msg.map(current => {
+         news.push({title: current.title, id: current.id, summary: current.summary});
+         this.setState({news})
+       });
+       console.log(this.state);
+     }).catch(error => {
+     console.log(error.response)
+     });
+   }
+
   render(){
 
   const responsive = {
@@ -55,9 +74,10 @@ class NewsFeed extends React.Component{
       partialVisibilityGutter: 30 // this is needed to tell the amount of px that should be visible.
     }
   }
-  return (
 
-    <Paper style={{padding: "1rem"}}>
+  return (
+    <Paper style={{height:"14rem"}} elevation={10}>
+    <IconButton style={{display: "inline"}} color="primary" size="small" onClick={this.handleUpdate}><CachedIcon /> </IconButton>
     <Carousel  infinite={true} autoPlay={this.props.deviceType !== "mobile" ? true : false} autoPlaySpeed={6000} responsive={responsive}>
      {this.state.news.map( headline =>
       <center>

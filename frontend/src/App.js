@@ -1,6 +1,6 @@
 import React from 'react';
 import NavBar from './components/nav_bar';
-import Main from './components/main';
+import Dashboard from './components/dashboard';
 import Login from './components/login';
 import Button from 'react-bootstrap/Button';
 import NotFound from './components/not_found';
@@ -39,7 +39,7 @@ class App extends React.Component{
       const {token , msg} = jwt.decode(signedPayload, "8kypu93zgd9w-=(7cvao=f3n*$to(gq+^178p##7=1+@x2@gn0");
       this.setState({token: token});
       this.setState({loggedIn: true});
-      this.props.history.push("/main");
+      this.props.history.push("/dashboard");
 
     }
 
@@ -69,6 +69,15 @@ class App extends React.Component{
       return jwe;
 }
 
+async generalDecrypt(jwe_token, key) {
+    const decoder = new TextDecoder();
+    const jwe = jwe_token;
+    const {plaintext, protectedHeader} = await compactDecrypt(jwe, key);
+    const signedPayload = await decoder.decode(plaintext);
+    const {data, msg}= jwt.decode(signedPayload, "8kypu93zgd9w-=(7cvao=f3n*$to(gq+^178p##7=1+@x2@gn0");
+    return data;
+  }
+
 
   handleUsernameChange = (event) => {
     this.setState({username: event.target.value});
@@ -82,7 +91,7 @@ class App extends React.Component{
     const url_login = "http://localhost:8000/api/test-login/";
     const data = {
       username: this.state.username,
-      password: this.state.password
+      password: this.state.password,
     }
     const jwe = this.encrypt(data);
     const payload = {
@@ -154,12 +163,10 @@ async handleKeyRetrieval(){
   });
   }
 
-
   notify = (message) => {
     toast.configure();
     toast(message);
   }
-
 
 
   handleNavbar = () => {
@@ -177,9 +184,9 @@ async handleKeyRetrieval(){
       <React.Fragment>
         <NavBar label={this.handleNavbar()}/>
         <Switch>
-        <Route path="/main"
+        <Route path="/dashboard"
         render={() => (
-          <Main loggedIn={this.state.loggedIn} username={this.state.username} token={this.state.token} encrypt={this.generalEncrypt} serverPubKey={this.state.serverPubKey}/>
+          <Dashboard loggedIn={this.state.loggedIn} username={this.state.username} token={this.state.token} encrypt={this.generalEncrypt} decrypt={this.generalDecrypt} privKey={this.state.userPrvKey} serverPubKey={this.state.serverPubKey}/>
           )} exact={true}/>
           <Route path="/login"
           render={() => (
